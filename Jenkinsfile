@@ -1,18 +1,18 @@
 pipeline {
   agent {
-    label 'Agent3'
+    //label 'Agent3'
   }
   
   environment {
-    MAVEN_HOME = tool name: 'maven2'
+    MAVEN_HOME = tool name: '3.9.2'
   }
   
   stages{
     stage('1.GetCode') {
       steps {
-        git "https://github.com/Abookey/maven-web-application"
-        //sh "git clone https://github.com/Abookey/maven-web-application"
-        //bat "git clone https://github.com/Abookey/maven-web-application"
+        git "https://github.com/NJOKI88/maven-web-application"
+        //sh "git clone https://github.com/NJOKI88/maven-web-application"
+        //bat "git clone https://github.com/NJOKI88/maven-web-application"
       }
     }
     
@@ -36,7 +36,7 @@ pipeline {
     
     stage('5.deploy2UAT') {
       steps {
-        deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://34.236.155.53:8187/')], contextPath: null, war: 'target/*war'
+        deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://44.210.145.51:8080/')], contextPath: null, war: 'target/*war'
       }
     }
     
