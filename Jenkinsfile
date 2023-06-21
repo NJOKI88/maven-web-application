@@ -1,10 +1,10 @@
 pipeline {
   agent {
-    label 'Agent4'
+    label 'agent4'
   }
   
   environment {
-    MAVEN_HOME = tool name: '3.9.2'
+    MAVEN_HOME = tool name: 'Maven3.9.2'
   }
   
   stages{
