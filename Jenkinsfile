@@ -1,66 +1,52 @@
-pipeline{
-  agent any 
-  tools {
-    maven "maven3.6.0"
-  }  
-  stages {
-    stage('1GetCode'){
-      steps{
-        sh "echo 'cloning the latest application version' "
-        git branch: 'feature', credentialsId: 'gitHubCredentials', url: 'https://github.com/LandmakTechnology/maven-web-application'
+pipeline {
+  agent {
+    label 'Agent3'
+  }
+  
+  environment {
+    MAVEN_HOME = tool name: 'maven2'
+  }
+  
+  stages{
+    stage('1.GetCode') {
+      steps {
+        git "https://github.com/Abookey/maven-web-application"
+        //sh "git clone https://github.com/Abookey/maven-web-application"
+        //bat "git clone https://github.com/Abookey/maven-web-application"
       }
     }
-    stage('3Test+Build'){
-      steps{
-        sh "echo 'running JUnit-test-cases' "
-        sh "echo 'testing must passed to create artifacts ' "
-        sh "mvn clean package"
+    
+    stage('2.Build') {
+      steps {
+        sh "${env.MAVEN_HOME}/bin/mvn package"
       }
     }
-    /*
-    stage('4CodeQuality'){
-      steps{
-        sh "echo 'Perfoming CodeQualityAnalysis' "
-        sh "mvn sonar:sonar"
+    
+    stage('3.codeQualityAnalysis') {
+      steps {
+        sh "${env.MAVEN_HOME}/bin/mvn sonar:sonar"
       }
     }
-    stage('5uploadNexus'){
-      steps{
-        sh "mvn deploy"
-      }
-    } 
-    stage('8deploy2prod'){
-      steps{
-        deploy adapters: [tomcat8(credentialsId: 'tomcat-credentials', path: '', url: 'http://35.170.249.131:8080/')], contextPath: null, war: 'target/*war'
+    
+    stage('4.upload') {
+      steps {
+        sh "${env.MAVEN_HOME}/bin/mvn deploy"
       }
     }
-}
-  post{
-    always{
-      emailext body: '''Hey guys
-Please check build status.
-
-Thanks
-Landmark 
-+1 437 215 2483''', recipientProviders: [buildUser(), developers()], subject: 'success', to: 'paypal-team@gmail.com'
+    
+    stage('5.deploy2UAT') {
+      steps {
+        deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://34.236.155.53:8187/')], contextPath: null, war: 'target/*war'
+      }
     }
-    success{
-      emailext body: '''Hey guys
-Good job build and deployment is successful.
-
-Thanks
-Landmark 
-+1 437 215 2483''', recipientProviders: [buildUser(), developers()], subject: 'success', to: 'paypal-team@gmail.com'
-    } 
-    failure{
-      emailext body: '''Hey guys
-Build failed. Please resolve issues.
-
-Thanks
-Landmark 
-+1 437 215 2483''', recipientProviders: [buildUser(), developers()], subject: 'success', to: 'paypal-team@gmail.com'
+    
+    stage('6.Approval') {
+      steps {
+        echo 'Apps ready for review'
+        timeout(time: 5, unit: 'HOURS') {
+          input message: 'Application ready for deployment. Please review and approve.'
+        }
+      }
     }
-  } 
-  */
-}
+  }
 }
