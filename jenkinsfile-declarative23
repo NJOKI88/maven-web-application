@@ -9,7 +9,7 @@ pipeline{
     stage('1clone'){
       steps{
         sh "echo ready to automate build"
-        git 'https://github.com/LandmakTechnology/maven-web-application'
+        git 'https://github.com/NJOKI88/maven-web-application'
         sh "echo latest application version collected from SCM"
       }   
     }
